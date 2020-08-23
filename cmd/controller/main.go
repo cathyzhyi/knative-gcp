@@ -17,12 +17,17 @@ limitations under the License.
 package main
 
 import (
+	"context"
 	"log"
 
 	"google.golang.org/api/option"
 
 	// The following line to load the gcp plugin (only required to authenticate against GKE clusters).
+
+	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/typed/apiextensions/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
+	apixclient "knative.dev/pkg/client/injection/apiextensions/client"
 
 	"github.com/google/knative-gcp/pkg/reconciler/broker"
 	"github.com/google/knative-gcp/pkg/reconciler/brokercell"
@@ -43,9 +48,24 @@ import (
 	"knative.dev/pkg/signals"
 )
 
+func checkKnativeInstalled(ctx context.Context) {
+	//var ret *rest.RESTClient
+	client := apixclient.Get(ctx)
+	getter := client.ApiextensionsV1().CustomResourceDefinitions()
+	checkCRDExists(getter, "broker.eventing.knative.dev")
+}
+
+func checkCRDExists(getter apiextensionsv1.CustomResourceDefinitionInterface , name string) {
+	crd, err := getter.Get(name, metav1.GetOptions{})
+	if err != nil  || crd != nil {
+		log.Fatal("Knative is not properly installed because crd " + name + " is missing")
+	} 
+}
+
 func main() {
 	appcredentials.MustExistOrUnsetEnv()
 	ctx := signals.NewContext()
+	checkKnativeInstalled(ctx)
 	controllers, err := InitializeControllers(ctx)
 	if err != nil {
 		log.Fatal(err)

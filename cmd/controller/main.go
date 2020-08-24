@@ -45,6 +45,7 @@ import (
 	"github.com/google/knative-gcp/pkg/utils/appcredentials"
 	"knative.dev/pkg/injection"
 	"knative.dev/pkg/injection/sharedmain"
+	"knative.dev/pkg/logging"
 	"knative.dev/pkg/signals"
 )
 
@@ -65,6 +66,8 @@ func checkCRDExists(getter apiextensionsv1.CustomResourceDefinitionInterface , n
 func main() {
 	appcredentials.MustExistOrUnsetEnv()
 	ctx := signals.NewContext()
+	logger := logging.FromContext(ctx)
+	logger.Info("yizhang")
 	checkKnativeInstalled(ctx)
 	controllers, err := InitializeControllers(ctx)
 	if err != nil {

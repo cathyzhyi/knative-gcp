@@ -205,6 +205,14 @@ func containerTemplate(args Args) corev1.Container {
 				Name:  "METRICS_DOMAIN",
 				Value: "knative.dev/internal/eventing",
 			},
+			{
+				Name:  "GCP_PROFILER",
+				Value: "true",
+			},
+			{
+				Name:  "GCP_PROFILER_SERVICE_VERSION",
+				Value: "test-0.1",
+			},
 		},
 		Ports: []corev1.ContainerPort{
 			{

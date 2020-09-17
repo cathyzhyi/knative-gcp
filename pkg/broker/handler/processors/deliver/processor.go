@@ -127,6 +127,11 @@ func (p *Processor) Process(ctx context.Context, e *event.Event) error {
 		defer cancel()
 	}
 
+	if p.RetryOnFailure {
+		logging.FromContext(ctx).Info("Always deliever to retry topic")
+		return p.sendToRetryTopic(ctx, target, e)
+	}
+
 	if err := p.deliver(dctx, target, broker, eventutil.NewImmutableEventMessage(e), hops); err != nil {
 		if !p.RetryOnFailure {
 			return err

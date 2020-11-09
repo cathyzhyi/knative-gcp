@@ -7,6 +7,7 @@ require (
 	cloud.google.com/go/logging v1.0.1-0.20200331222814-69e77e66e597
 	cloud.google.com/go/pubsub v1.8.0
 	cloud.google.com/go/storage v1.10.0
+	github.com/armon/go-metrics v0.0.0-20180917152333-f0300d1749da
 	github.com/cloudevents/sdk-go/protocol/pubsub/v2 v2.2.1-0.20200806165906-9ae0708e27fa
 	github.com/cloudevents/sdk-go/v2 v2.3.1
 	github.com/fsnotify/fsnotify v1.4.9
@@ -15,6 +16,9 @@ require (
 	github.com/google/uuid v1.1.2
 	github.com/google/wire v0.4.0
 	github.com/googleapis/gax-go/v2 v2.0.5
+	github.com/hashicorp/go-msgpack v0.5.3
+	github.com/hashicorp/memberlist v0.2.2
+	github.com/hashicorp/serf v0.9.5
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/pelletier/go-toml v1.8.0
@@ -41,6 +45,7 @@ require (
 )
 
 replace (
+	github.com/hashicorp/serf => github.com/hashicorp/serf v0.9.5
 	k8s.io/api => k8s.io/api v0.18.8
 	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.18.8
 	k8s.io/apimachinery => k8s.io/apimachinery v0.18.8

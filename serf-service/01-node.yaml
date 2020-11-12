@@ -1,21 +1,3 @@
-apiVersion: v1
-kind: Service
-metadata:
-  name: serf-service
-  namespace: cloud-run-events 
-spec:
-  selector:
-    app: serf-service
-  ports:
-    - name: "serf-tcp"
-      port: 7946
-      targetPort: 7946
-      protocol: TCP
-    - name: "serf-udp"
-      port: 7946
-      targetPort: 7946
-      protocol: UDP
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -24,7 +6,7 @@ metadata:
   labels:
     app: serf-service
 spec:
-  replicas: 3 
+  replicas: 1 
   selector:
     matchLabels:
       app: serf-service
@@ -35,7 +17,7 @@ spec:
     spec:
       containers:
       - name: serf-service
-        image: ko://github.com/google/knative-gcp/serf-service
+        image: ko://github.com/google/knative-gcp/serf-service/cmd
         ports:
           - containerPort: 7946
         env:

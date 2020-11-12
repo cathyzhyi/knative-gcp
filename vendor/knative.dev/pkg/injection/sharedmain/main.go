@@ -37,6 +37,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/rest"
 
+	serfsvc "github.com/google/knative-gcp/serf-service/utils"
 	kubeclient "knative.dev/pkg/client/injection/kube/client"
 	"knative.dev/pkg/configmap"
 	"knative.dev/pkg/controller"
@@ -236,6 +237,10 @@ func MainWithConfig(ctx context.Context, component string, cfg *rest.Config, cto
 	}
 	logger.Info("Starting controllers...")
 	go controller.StartAll(ctx, controllers...)
+
+	if component == "controller" {
+		serfsvc.Start(ctx)
+	}
 
 	// This will block until either a signal arrives or one of the grouped functions
 	// returns an error.

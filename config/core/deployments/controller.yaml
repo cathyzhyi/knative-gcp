@@ -68,6 +68,14 @@ spec:
           value: ko://github.com/google/knative-gcp/cmd/broker/retry
         - name: INTERNAL_METRICS_ENABLED
           value: "false"
+        - name: MY_POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name 
+        - name: MY_POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
         volumeMounts:
         - name: google-cloud-key
           mountPath: /var/secrets/google
@@ -83,6 +91,8 @@ spec:
         ports:
         - name: metrics
           containerPort: 9090
+        - name: serf
+          containerPort: 7946
       volumes:
       - name: config-logging
         configMap:

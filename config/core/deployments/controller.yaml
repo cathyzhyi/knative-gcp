@@ -68,11 +68,11 @@ spec:
           value: ko://github.com/google/knative-gcp/cmd/broker/retry
         - name: INTERNAL_METRICS_ENABLED
           value: "false"
-        - name: MY_POD_NAME
+        - name: POD_NAME
           valueFrom:
             fieldRef:
               fieldPath: metadata.name 
-        - name: MY_POD_IP
+        - name: POD_IP
           valueFrom:
             fieldRef:
               fieldPath: status.podIP

@@ -205,6 +205,14 @@ func containerTemplate(args Args) corev1.Container {
 				},
 			},
 			{
+				Name: "POD_IP",
+				ValueFrom: &corev1.EnvVarSource{
+					FieldRef: &corev1.ObjectFieldSelector{
+						FieldPath: "status.podIP",
+					},
+				},
+			},
+			{
 				Name:  "CONFIG_LOGGING_NAME",
 				Value: "config-logging",
 			},
@@ -222,6 +230,10 @@ func containerTemplate(args Args) corev1.Container {
 			{
 				Name:          "metrics",
 				ContainerPort: int32(args.MetricsPort),
+			},
+			{
+				Name:          "serf",
+				ContainerPort: int32(args.SerfPort),
 			},
 		},
 		VolumeMounts: []corev1.VolumeMount{

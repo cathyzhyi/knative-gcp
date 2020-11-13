@@ -61,8 +61,8 @@ func Start(ctx context.Context) *serf.Serf {
 
 func startSerfInstance(serfConfig *serf.Config, eventCh chan serf.Event) (*serf.Serf, error) {
 	serfConfig.EventCh = eventCh
-	bindAddr := os.Getenv("MY_POD_IP")
-	serfConfig.NodeName = os.Getenv("MY_POD_NAME")
+	bindAddr := os.Getenv("POD_IP")
+	serfConfig.NodeName = os.Getenv("POD_NAME")
 	serfConfig.MemberlistConfig.BindAddr = bindAddr
 	return serf.Create(serfConfig)
 }

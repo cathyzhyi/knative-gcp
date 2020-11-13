@@ -22,6 +22,7 @@ import (
 	"github.com/google/knative-gcp/pkg/utils/appcredentials"
 	"github.com/google/knative-gcp/pkg/utils/clients"
 	"github.com/google/knative-gcp/pkg/utils/mainhelper"
+	serfsvc "github.com/google/knative-gcp/serf-service/utils"
 
 	"cloud.google.com/go/pubsub"
 	"go.uber.org/zap"
@@ -71,6 +72,7 @@ func main() {
 		logger.Desugar().Fatal("Unable to create ingress handler: ", zap.Error(err))
 	}
 
+	serfsvc.Start(ctx)
 	logger.Desugar().Info("Starting ingress.", zap.Any("ingress", ingress))
 	if err := ingress.Start(ctx); err != nil {
 		logger.Desugar().Fatal("failed to start ingress: ", zap.Error(err))

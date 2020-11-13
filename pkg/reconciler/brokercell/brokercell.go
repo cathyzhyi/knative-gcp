@@ -51,6 +51,7 @@ type envConfig struct {
 	ServiceAccountName     string `envconfig:"SERVICE_ACCOUNT" default:"broker"`
 	IngressPort            int    `envconfig:"INGRESS_PORT" default:"8080"`
 	MetricsPort            int    `envconfig:"METRICS_PORT" default:"9090"`
+	SerfPort               int    `envconfig:"SERF_PORT" default:"7946"`
 	InternalMetricsEnabled bool   `envconfig:"INTERNAL_METRICS_ENABLED" default:"false"`
 }
 
@@ -236,6 +237,7 @@ func (r *Reconciler) makeIngressArgs(bc *intv1alpha1.BrokerCell) resources.Ingre
 			Image:              r.env.IngressImage,
 			ServiceAccountName: r.env.ServiceAccountName,
 			MetricsPort:        r.env.MetricsPort,
+			SerfPort:           r.env.SerfPort,
 			AllowIstioSidecar:  true,
 			CPURequest:         bc.Spec.Components.Ingress.CPURequest,
 			CPULimit:           bc.Spec.Components.Ingress.CPULimit,
@@ -277,6 +279,7 @@ func (r *Reconciler) makeFanoutArgs(bc *intv1alpha1.BrokerCell) resources.Fanout
 			Image:              r.env.FanoutImage,
 			ServiceAccountName: r.env.ServiceAccountName,
 			MetricsPort:        r.env.MetricsPort,
+			SerfPort:           r.env.SerfPort,
 			AllowIstioSidecar:  true,
 			CPURequest:         bc.Spec.Components.Fanout.CPURequest,
 			CPULimit:           bc.Spec.Components.Fanout.CPULimit,
@@ -306,6 +309,7 @@ func (r *Reconciler) makeRetryArgs(bc *intv1alpha1.BrokerCell) resources.RetryAr
 			Image:              r.env.RetryImage,
 			ServiceAccountName: r.env.ServiceAccountName,
 			MetricsPort:        r.env.MetricsPort,
+			SerfPort:           r.env.SerfPort,
 			AllowIstioSidecar:  true,
 			CPURequest:         bc.Spec.Components.Retry.CPURequest,
 			CPULimit:           bc.Spec.Components.Retry.CPULimit,

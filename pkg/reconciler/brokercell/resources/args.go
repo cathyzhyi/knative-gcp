@@ -54,6 +54,7 @@ type Args struct {
 	Image              string
 	ServiceAccountName string
 	MetricsPort        int
+	SerfPort           int
 	AllowIstioSidecar  bool
 	CPURequest         string
 	CPULimit           string

@@ -31,6 +31,7 @@ import (
 	"github.com/google/knative-gcp/pkg/utils/appcredentials"
 	"github.com/google/knative-gcp/pkg/utils/clients"
 	"github.com/google/knative-gcp/pkg/utils/mainhelper"
+	serfsvc "github.com/google/knative-gcp/serf-service/utils"
 )
 
 const (
@@ -100,6 +101,8 @@ func main() {
 	if _, err := handler.StartSyncPool(ctx, syncPool, syncSignal, env.MaxStaleDuration, handler.DefaultHealthCheckPort); err != nil {
 		logger.Fatal("Failed to start retry sync pool", zap.Error(err))
 	}
+
+	serfsvc.Start(ctx)
 
 	// Context will be done if a TERM signal is issued.
 	<-ctx.Done()

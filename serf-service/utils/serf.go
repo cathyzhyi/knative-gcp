@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/google/knative-gcp/pkg/logging"
 	"github.com/hashicorp/serf/serf"
@@ -43,13 +44,18 @@ func Start(ctx context.Context) *serf.Serf {
 	go ProcessReceivedEvent(eventCh)
 
 	// broadcast messages
-	var b strings.Builder
-	b.WriteString("ping all from ")
-	b.WriteString(serfConfig.NodeName)
-	err = serflib.UserEvent(b.String(), []byte("tests"), false)
-	if err != nil {
-		logging.FromContext(ctx).Error("Failed to send events")
-	}
+	go func() {
+		var b strings.Builder
+		b.WriteString("ping all from ")
+		b.WriteString(serfConfig.NodeName)
+		for {
+			err = serflib.UserEvent(b.String(), []byte("tests"), false)
+			if err != nil {
+				logging.FromContext(ctx).Error("Failed to send events")
+			}
+			time.Sleep(5 * time.Second)
+		}
+	}()
 	return serflib
 }
 

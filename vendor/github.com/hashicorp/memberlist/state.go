@@ -316,6 +316,8 @@ func (m *Memberlist) probeNode(node *nodeState) {
 	// soon as possible.
 	deadline := sent.Add(probeInterval)
 	addr := node.Address()
+	fullAddr := node.FullAddress()
+	fullAddrStr := (&fullAddr).String()
 
 	// Arrange for our self-awareness to get updated.
 	var awarenessDelta int
@@ -325,6 +327,7 @@ func (m *Memberlist) probeNode(node *nodeState) {
 	if node.State == StateAlive {
 		if err := m.encodeAndSendMsg(node.FullAddress(), pingMsg, &ping); err != nil {
 			m.logger.Printf("[ERR] memberlist: Failed to send ping: %s", err)
+			m.logger.Printf("[ERR] memberlist: Failed to send ping full address yizhang: %s", fullAddrStr)
 			if failedRemote(err) {
 				goto HANDLE_REMOTE_FAILURE
 			} else {

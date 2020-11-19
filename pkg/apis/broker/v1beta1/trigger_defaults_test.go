@@ -17,11 +17,14 @@ limitations under the License.
 package v1beta1
 
 import (
-	"context"
 	"testing"
+
+	_ "knative.dev/pkg/client/injection/apiextensions/client/fake"
+	. "knative.dev/pkg/reconciler/testing"
 )
 
 func TestTrigger_SetDefaults(t *testing.T) {
 	trig := Trigger{}
-	trig.SetDefaults(context.TODO())
+	ctx, _ := SetupFakeContext(t)
+	trig.SetDefaults(ctx)
 }

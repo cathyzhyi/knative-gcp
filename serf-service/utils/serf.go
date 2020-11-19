@@ -20,6 +20,13 @@ func Start(ctx context.Context) *serf.Serf {
 	eventCh := make(chan serf.Event, 64)
 	serfConfig := serf.DefaultConfig()
 	serflib, err := startSerfInstance(serfConfig, eventCh)
+	isController := strings.Contains(serfConfig.NodeName, "controller")
+	if isController {
+		serfConfig.Tags["role"] = "controller"
+	} else {
+		serfConfig.Tags["role"] = "dataplane"
+	}
+
 	if err != nil {
 		logging.FromContext(ctx).Error("error creating serflib", zap.Error(err))
 		serflib = nil
@@ -41,19 +48,45 @@ func Start(ctx context.Context) *serf.Serf {
 	}
 
 	logging.FromContext(ctx).Info("join existing cluster succeed", zap.String("serf-service-cluster IP", otherGroup[0]))
-	go ProcessReceivedEvent(eventCh)
+	go ProcessReceivedEvent(ctx, eventCh)
 
 	// broadcast messages
 	go func() {
-		var b strings.Builder
-		b.WriteString("ping all from ")
-		b.WriteString(serfConfig.NodeName)
+		var bstr strings.Builder
+		bstr.WriteString("ping all from ")
+		bstr.WriteString(serfConfig.NodeName)
+
+		var qstr strings.Builder
+		qstr.WriteString("query brokercell pods name from ")
+		qstr.WriteString(serfConfig.NodeName)
 		for {
-			err = serflib.UserEvent(b.String(), []byte("tests"), false)
+			time.Sleep(10 * time.Second)
+
+			/*
+				err = serflib.UserEvent(bstr.String(), []byte("tests"), false)
+				if err != nil {
+					logging.FromContext(ctx).Error("Failed to send events")
+				}
+			*/
+
+			if !strings.Contains(serfConfig.NodeName, "controller") {
+				continue
+			}
+			params := serflib.DefaultQueryParams()
+			params.FilterTags = map[string]string{
+				"role": "dataplane",
+			}
+			resp, err := serflib.Query(qstr.String(), []byte("tests query"), params)
+			respCh := resp.ResponseCh()
+			for r := range respCh {
+				s := string(r.Payload)
+				logging.FromContext(ctx).Info("dump Response from ", zap.String("From: ", r.From), zap.String("Response: ", s))
+			}
+
 			if err != nil {
 				logging.FromContext(ctx).Error("Failed to send events")
 			}
-			time.Sleep(5 * time.Second)
+			logging.FromContext(ctx).Info("dump query response ", zap.Any("response", resp))
 		}
 	}()
 	return serflib
@@ -67,11 +100,26 @@ func startSerfInstance(serfConfig *serf.Config, eventCh chan serf.Event) (*serf.
 	return serf.Create(serfConfig)
 }
 
-func ProcessReceivedEvent(eventCh chan serf.Event) {
+func ProcessReceivedEvent(ctx context.Context, eventCh chan serf.Event) {
 	for {
 		select {
 		case event := <-eventCh:
-			fmt.Printf("SUCCESS!! received user Event: %s\n", event.String())
+			switch event.EventType() {
+			case serf.EventQuery:
+				q := event.(*serf.Query)
+				nodeName := os.Getenv("POD_NAME")
+				var rstr strings.Builder
+				rstr.WriteString("response query: ")
+				rstr.WriteString(nodeName)
+				err := q.Respond([]byte(rstr.String()))
+				if err == nil {
+					fmt.Printf("SUCCESS!! received user query: %s\n", event.String())
+				} else {
+					logging.FromContext(ctx).Error("FAILD: reply to: ", zap.Error(err))
+				}
+			case serf.EventUser:
+				fmt.Printf("SUCCESS!! received user Event: %s\n", event.String())
+			}
 		}
 	}
 }

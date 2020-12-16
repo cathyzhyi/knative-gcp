@@ -69,14 +69,21 @@ func Start(ctx context.Context) *serf.Serf {
 				}
 			*/
 
-			if !strings.Contains(serfConfig.NodeName, "controller") {
+			if !isController {
 				continue
 			}
 			params := serflib.DefaultQueryParams()
 			params.FilterTags = map[string]string{
 				"role": "dataplane",
 			}
-			resp, err := serflib.Query(qstr.String(), []byte("tests query"), params)
+
+			params.FilterNodes = make([]string, 0)
+			params.FilterNodes = append(params.FilterNodes, "default-brokercell-fanout-6b6478fdfd-4zgvk")
+			params.FilterNodes = append(params.FilterNodes, "default-brokercell-retry-78fcd97f78-hz72m")
+			var payload strings.Builder
+			payload.WriteString("tests query")
+			payload.WriteString(time.Now().Format("15:04:05"))
+			resp, err := serflib.Query(qstr.String(), []byte(payload.String()), params)
 			respCh := resp.ResponseCh()
 			for r := range respCh {
 				s := string(r.Payload)
@@ -111,6 +118,8 @@ func ProcessReceivedEvent(ctx context.Context, eventCh chan serf.Event) {
 				var rstr strings.Builder
 				rstr.WriteString("response query: ")
 				rstr.WriteString(nodeName)
+				rstr.WriteString(" for time: ")
+				rstr.WriteString(string(q.Payload))
 				err := q.Respond([]byte(rstr.String()))
 				if err == nil {
 					fmt.Printf("SUCCESS!! received user query: %s\n", event.String())

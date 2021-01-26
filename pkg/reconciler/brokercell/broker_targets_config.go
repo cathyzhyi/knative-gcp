@@ -32,6 +32,7 @@ import (
 	"github.com/google/knative-gcp/pkg/broker/config/memory"
 	brokerresources "github.com/google/knative-gcp/pkg/reconciler/broker/resources"
 	"github.com/google/knative-gcp/pkg/reconciler/brokercell/resources"
+	"github.com/google/knative-gcp/pkg/reconciler/utils"
 	"github.com/google/knative-gcp/pkg/reconciler/utils/volume"
 )
 
@@ -54,6 +55,9 @@ func (r *Reconciler) reconcileConfig(ctx context.Context, bc *intv1alpha1.Broker
 	// maintaining 2 queues for updated brokers and triggers, and only update the config for updated brokers/triggers.
 	brokerTargets := memory.NewEmptyTargets()
 	for _, broker := range brokers {
+		if !utils.BrokerClassFilter(broker) {
+			continue
+		}
 		// Filter by `eventing.knative.dev/broker: <name>` here
 		// to get only the triggers for this broker. The trigger webhook will
 		// ensure that triggers are always labeled with their broker name.

@@ -42,6 +42,7 @@ import (
 	metadataClient "github.com/google/knative-gcp/pkg/gclient/metadata"
 	"github.com/google/knative-gcp/pkg/reconciler"
 	"github.com/google/knative-gcp/pkg/reconciler/broker/resources"
+	reconcilerutils "github.com/google/knative-gcp/pkg/reconciler/utils"
 	reconcilerutilspubsub "github.com/google/knative-gcp/pkg/reconciler/utils/pubsub"
 	"github.com/google/knative-gcp/pkg/utils"
 	"knative.dev/eventing/pkg/apis/eventing/v1beta1"
@@ -113,7 +114,7 @@ func (r *Reconciler) ReconcileKind(ctx context.Context, t *brokerv1beta1.Trigger
 		return r.FinalizeKind(ctx, t)
 	}
 
-	if !filterBroker(b) {
+	if !reconcilerutils.BrokerClassFilter(b) {
 		// Call Finalizer anyway in case the Trigger still holds GCP Broker related resources.
 		// If a Trigger used to point to a GCP Broker but now has a Broker with a different brokerclass,
 		// we should clean up resources related to GCP Broker.

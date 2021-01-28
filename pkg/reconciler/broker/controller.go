@@ -46,6 +46,7 @@ const (
 	// controllerAgentName is the string used by this controller to identify
 	// itself when creating events.
 	controllerAgentName = "broker-controller"
+	finalizerName       = "googlecloud"
 )
 
 type Constructor injection.ControllerConstructor
@@ -94,7 +95,9 @@ func newController(ctx context.Context, cmw configmap.Watcher, brds *brokerdeliv
 	impl := brokerreconciler.NewImpl(ctx, r, brokerv1beta1.BrokerClass,
 		func(impl *controller.Impl) controller.Options {
 			return controller.Options{
-				ConfigStore: brds,
+				ConfigStore:   brds,
+				FinalizerName: finalizerName,
+				AgentName:     controllerAgentName,
 			}
 		})
 

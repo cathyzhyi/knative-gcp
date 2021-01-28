@@ -82,7 +82,7 @@ func (r *Reconciler) ReconcileKind(ctx context.Context, b *brokerv1beta1.Broker)
 
 func (r *Reconciler) FinalizeKind(ctx context.Context, b *brokerv1beta1.Broker) pkgreconciler.Event {
 	logger := logging.FromContext(ctx)
-	logger.Debug("Finalizing Broker", zap.Any("broker", b))
+	logger.Info("Finalizing Broker", zap.Any("broker", b))
 
 	if err := r.deleteDecouplingTopicAndSubscription(ctx, b); err != nil {
 		return fmt.Errorf("failed to delete Pub/Sub topic: %v", err)
@@ -93,7 +93,7 @@ func (r *Reconciler) FinalizeKind(ctx context.Context, b *brokerv1beta1.Broker) 
 
 func (r *Reconciler) reconcileBroker(ctx context.Context, b *brokerv1beta1.Broker) error {
 	logger := logging.FromContext(ctx)
-	logger.Debug("Reconciling Broker", zap.Any("broker", b))
+	logger.Info("Reconciling Broker", zap.Any("broker", b))
 	b.Status.InitializeConditions()
 	b.Status.ObservedGeneration = b.Generation
 

@@ -15,7 +15,7 @@
 apiVersion: eventing.knative.dev/v1beta1
 kind: Broker
 metadata:
-  name: test-broker
+  name: test-broker-2
   namespace: events-system-example
   annotations:
     "eventing.knative.dev/broker.class": "googlecloud"
